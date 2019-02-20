@@ -1,14 +1,14 @@
 #include <M5Stack.h>
 //#include <TinyGPS++.h>
-#include <VL53L0X.h>
+//#include <VL53L0X.h>
 #include "utility/MPU9250.h"
 #include "utility/quaternionFilters.h"
 
 MPU9250 IMU;
-HardwareSerial GPSRaw(2);
+//HardwareSerial GPSRaw(2);
 
 //TinyGPSPlus gps;
-VL53L0X vl53;
+//VL53L0X vl53;
 
 int fullstroke = 1000;
 int stroke = 0;
@@ -32,9 +32,9 @@ void setup() {
   
 //  GPSRaw.begin(9600);
 
-  vl53.init();
+//  vl53.init();
  
-vl53.setMeasurementTimingBudget(20000);
+//vl53.setMeasurementTimingBudget(20000);
   //vl53.setTimeout(500);
   
   M5.Lcd.setTextSize(2);
