@@ -87,44 +87,84 @@ void loop() {
     
 //    M5.Lcd.printf("%.+04.0f,%+04.0f,%+04.0f",IMU.pitch,IMU.yaw*RAD_TO_DEG,IMU.roll*RAD_TO_DEG);
 
+    float lastbar =  sqrt(abs(12100-lastpitch*lastpitch*16));
     float pitchbar = sqrt(abs(12100-IMU.pitch*IMU.pitch*16));
-    M5.Lcd.drawLine(50,120+lastpitch*4,270,120+lastpitch*4,TFT_BLACK);
-    M5.Lcd.drawLine(160-pitchbar,120+IMU.pitch*4,160+pitchbar,120+IMU.pitch*4,TFT_GREEN);
+    //horizontal line
     
+    M5.Lcd.drawLine(160-lastpitch*4*cos(lastroll)-lastbar*sin(lastroll),
+                    120+lastpitch*4*sin(lastroll)-lastbar*cos(lastroll),
+                    160-lastpitch*4*cos(lastroll)+lastbar*sin(lastroll),
+                    120+lastpitch*4*sin(lastroll)+lastbar*cos(lastroll),TFT_BLACK);
+    if(abs(IMU.pitch*4)<100){
+    M5.Lcd.drawLine(160-IMU.pitch*4*cos(IMU.roll)-pitchbar*sin(IMU.roll),
+                    120+IMU.pitch*4*sin(IMU.roll)-pitchbar*cos(IMU.roll),
+                    160-IMU.pitch*4*cos(IMU.roll)+pitchbar*sin(IMU.roll),
+                    120+IMU.pitch*4*sin(IMU.roll)+pitchbar*cos(IMU.roll),TFT_GREEN);
+    }
     for(int i=-9;i<=9;i++){
       M5.Lcd.drawLine(160-30,120+40*i+lastpitch*4,160+30,120+40*i+lastpitch*4,TFT_BLACK);
       M5.Lcd.drawLine(160-15,120-20+40*i+lastpitch*4,160+15,120-20+40*i+lastpitch*4,TFT_BLACK);
-      M5.Lcd.setCursor(160+40,120+40*i+lastpitch*4-5);
+      M5.Lcd.setCursor(160-(lastpitch*4-40*i)*cos(lastroll)+30*sin(lastroll)+5,
+                        120+(lastpitch*4-40*i)*sin(lastroll)+30*cos(lastroll)-5);
       M5.Lcd.setTextColor(TFT_BLACK);
       M5.Lcd.printf("%d",i*10);
-      if(120+IMU.pitch*4+40*i>25&&120+IMU.pitch*4+40*i<225){
-         M5.Lcd.drawLine(160-30,120+40*i+IMU.pitch*4,160+30,120+40*i+IMU.pitch*4,TFT_GREEN);
-         M5.Lcd.setCursor(160+40,120+40*i+IMU.pitch*4-5);
+
+     M5.Lcd.drawLine(160-(lastpitch*4-40*i)*cos(lastroll)-30*sin(lastroll),
+                      120+(lastpitch*4-40*i)*sin(lastroll)-30*cos(lastroll),
+                      160-(lastpitch*4-40*i)*cos(lastroll)+30*sin(lastroll),
+                      120+(lastpitch*4-40*i)*sin(lastroll)+30*cos(lastroll),
+                      TFT_BLACK);
+     M5.Lcd.drawLine(160-(lastpitch*4-40*i-20)*cos(lastroll)-15*sin(lastroll),
+                      120+(lastpitch*4-40*i-20)*sin(lastroll)-15*cos(lastroll),
+                      160-(lastpitch*4-40*i-20)*cos(lastroll)+15*sin(lastroll),
+                      120+(lastpitch*4-40*i-20)*sin(lastroll)+15*cos(lastroll),
+                      TFT_BLACK);
+      
+      if(abs(IMU.pitch*4-i*40)<100){
+        
+         M5.Lcd.drawLine(160-(IMU.pitch*4-40*i)*cos(IMU.roll)-30*sin(IMU.roll),
+                          120+(IMU.pitch*4-40*i)*sin(IMU.roll)-30*cos(IMU.roll),
+                          160-(IMU.pitch*4-40*i)*cos(IMU.roll)+30*sin(IMU.roll),
+                          120+(IMU.pitch*4-40*i)*sin(IMU.roll)+30*cos(IMU.roll),
+                          TFT_GREEN);
+         M5.Lcd.drawLine(160-(IMU.pitch*4-40*i-20)*cos(IMU.roll)-15*sin(IMU.roll),
+                          120+(IMU.pitch*4-40*i-20)*sin(IMU.roll)-15*cos(IMU.roll),
+                          160-(IMU.pitch*4-40*i-20)*cos(IMU.roll)+15*sin(IMU.roll),
+                          120+(IMU.pitch*4-40*i-20)*sin(IMU.roll)+15*cos(IMU.roll),
+                          TFT_GREEN);
+         M5.Lcd.setCursor(160-(IMU.pitch*4-40*i)*cos(IMU.roll)+30*sin(IMU.roll)+5,
+                          120+(IMU.pitch*4-40*i)*sin(IMU.roll)+30*cos(IMU.roll)-5);
          M5.Lcd.setTextColor(TFT_GREEN);
          M5.Lcd.printf("%d",i*10);
         }
-        if(120-20+IMU.pitch*4+40*i>15&&120-20+IMU.pitch*4+40*i<225){
-         M5.Lcd.drawLine(160-15,120-20+40*i+IMU.pitch*4,160+15,120-20+40*i+IMU.pitch*4,TFT_GREEN);
-        }
+        
       }
-    
-    M5.Lcd.drawLine(160+80*sin(lastroll),120+80*cos(lastroll),160+80*sin(lastroll+3.14),120+80*cos(lastroll+3.14),TFT_BLACK);
-    M5.Lcd.drawLine(160+80*sin(IMU.roll),120+80*cos(IMU.roll),160+80*sin(IMU.roll+3.14),120+80*cos(IMU.roll+3.14),TFT_GREEN);
 
+    //mini aircraft
+    //M5.Lcd.drawLine(160-80*sin(lastroll),120+80*cos(lastroll),160+80*sin(lastroll),120-80*cos(lastroll),TFT_BLACK);
+    M5.Lcd.drawLine(160-50,120,160+50,120,TFT_ORANGE);
+    //bank bar
     M5.Lcd.drawLine(160+110*cos(lastroll),120-110*sin(lastroll),160+80*cos(lastroll),120-80*sin(lastroll),TFT_BLACK);
     M5.Lcd.drawLine(160+110*cos(IMU.roll),120-110*sin(IMU.roll),160+80*cos(IMU.roll),120-80*sin(IMU.roll),TFT_GREEN);
 
     M5.Lcd.setCursor(0,0);
-    M5.Lcd.setTextColor(TFT_GREEN);
-  //  while(!gps.location.isUpdated()){
+    M5.Lcd.setTextColor(TFT_GREEN,TFT_BLACK);
+    M5.Lcd.println(IMU.yaw*RAD_TO_DEG);
+
+    //GPS 
+    //while(!gps.location.isUpdated()){
+
       while(GPSRaw.available()>0){
-        if(gps.encode(GPSRaw.read())){
+        int rawdata = GPSRaw.read();
+        Serial.write(rawdata);
+        if(gps.encode(rawdata)){
+          M5.Lcd.print("break");
           break;
         }
       }
-      //}
+   //   }
     
-    //M5.Lcd.print(gps.location.lat());
+    M5.Lcd.print(gps.satellites.value());
 
     M5.update();
 
