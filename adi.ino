@@ -1,12 +1,12 @@
 #include <M5Stack.h>
-#include<TinyGPS++.h>
+//#include<TinyGPS++.h>
 #include "utility/MPU9250.h"
 #include "utility/quaternionFilters.h"
 
 MPU9250 IMU;
-HardwareSerial GPSRaw(2);
+//HardwareSerial GPSRaw(2);
 
-TinyGPSPlus gps;
+//TinyGPSPlus gps;
 
 
 void setup() {
@@ -14,7 +14,7 @@ void setup() {
   M5.begin();
   Wire.begin();
   
-  GPSRaw.begin(9600);
+//  GPSRaw.begin(9600);
   
   M5.Lcd.setTextSize(2);
   randomSeed(analogRead(0));
@@ -93,13 +93,15 @@ void loop() {
 
     float lastbar =  sqrt(abs(12100-lastpitch*lastpitch*16));
     float pitchbar = sqrt(abs(12100-IMU.pitch*IMU.pitch*16));
-    //horizontal line
+    //yoku tsukau
     float coslroll=cos(lastroll);
     float sinlroll=sin(lastroll);
 
     float cosroll = cos(IMU.roll);
     float sinroll = sin(IMU.roll);
 
+    
+//Horizon bar
     M5.Lcd.drawLine(160-lastpitch*4*coslroll-lastbar*sinlroll,
                     120+lastpitch*4*sinlroll-lastbar*coslroll,
                     160-lastpitch*4*coslroll+lastbar*sinlroll,
@@ -118,7 +120,7 @@ void loop() {
       M5.Lcd.setTextColor(TFT_BLACK);
       M5.Lcd.printf("%d",i*10);
 
-
+    //Pitch scale 10deg 60px 5deg 30px
      M5.Lcd.drawLine(160-(lastpitch*4-40*i)*coslroll-30*sinlroll,
                       120+(lastpitch*4-40*i)*sinlroll-30*coslroll,
                       160-(lastpitch*4-40*i)*coslroll+30*sinlroll,
@@ -153,6 +155,7 @@ void loop() {
     //mini aircraft
     //M5.Lcd.drawLine(160-80*sin(lastroll),120+80*cos(lastroll),160+80*sin(lastroll),120-80*cos(lastroll),TFT_BLACK);
     M5.Lcd.drawLine(160-50,120,160+50,120,TFT_ORANGE);
+    M5.Lcd.drawRect(158,118,5,5,TFT_ORANGE);
     //bank bar
     M5.Lcd.drawLine(160+110*coslroll,120-110*sinlroll,160+80*coslroll,120-80*sinlroll,TFT_BLACK);
     M5.Lcd.drawLine(160+110*cosroll,120-110*sinroll,160+80*cosroll,120-80*sinroll,TFT_GREEN);
@@ -160,13 +163,13 @@ void loop() {
     M5.Lcd.drawLine(160-100*sin(lastacx/2),120+100*cos(lastacx/2),160-110*sin(lastacx/2),120+110*cos(lastacx/2),TFT_BLACK);
     M5.Lcd.drawLine(160-100*sin(acx/2),120+100*cos(acx/2),160-110*sin(acx/2),120+110*cos(acx/2),TFT_GREEN);
     
-    M5.Lcd.setCursor(0,0);
-    M5.Lcd.setTextColor(TFT_GREEN,TFT_BLACK);
-    M5.Lcd.printf("%+2.2f  %+2.2f\n",acx,acz);
+    //M5.Lcd.setCursor(0,0);
+   // M5.Lcd.setTextColor(TFT_GREEN,TFT_BLACK);
+  //  M5.Lcd.printf("%+2.2f  %+2.2f\n",acx,acz);
 
     //GPS 
     //while(!gps.location.isUpdated()){
-
+/*
       while(GPSRaw.available()>0){
         int rawdata = GPSRaw.read();
         Serial.write(rawdata);
@@ -175,9 +178,9 @@ void loop() {
           break;
         }
       }
-   //   }
+  */ //   }
     
-    M5.Lcd.print(gps.location.lat());
+   // M5.Lcd.print(gps.location.lat());
 
     M5.update();
 
