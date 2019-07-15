@@ -25,21 +25,21 @@ void setup() {
 
 }
 
-float lastroll,lastpitch;
+float lastroll,lastpitch,lastacx;
 
 void loop() {
     M5.Lcd.drawCircle(160,120,110,TFT_GREEN);
 
-    M5.Lcd.fillRect(160-2,0,4,10,TFT_GREEN);
+    M5.Lcd.fillRect(158,0,4,10,TFT_GREEN);
    
-    M5.Lcd.drawLine(160-21,120-118,160-19,120-108,TFT_GREEN);
-    M5.Lcd.drawLine(160-41,120-113,160-38,120-103,TFT_GREEN);
-    M5.Lcd.drawLine(160-60,120-104,160-55,120-95,TFT_GREEN);
-    M5.Lcd.drawLine(160-104,120-60,160-95,120-55,TFT_GREEN);
-    M5.Lcd.drawLine(160+21,120-118,160+19,120-108,TFT_GREEN);
-    M5.Lcd.drawLine(160+41,120-113,160+38,120-103,TFT_GREEN);
-    M5.Lcd.drawLine(160+60,120-104,160+55,120-95,TFT_GREEN);
-    M5.Lcd.drawLine(160+104,120-60,160+95,120-55,TFT_GREEN); 
+    M5.Lcd.drawLine(139,2,141,12,TFT_GREEN);
+    M5.Lcd.drawLine(119,7,122,17,TFT_GREEN);
+    M5.Lcd.drawLine(100,16,105,25,TFT_GREEN);
+    M5.Lcd.drawLine(56,60,65,65,TFT_GREEN);
+    M5.Lcd.drawLine(181,2,179,12,TFT_GREEN);
+    M5.Lcd.drawLine(201,7,198,17,TFT_GREEN);
+    M5.Lcd.drawLine(220,16,215,25,TFT_GREEN);
+    M5.Lcd.drawLine(264,60,255,65,TFT_GREEN); 
   // put your main code here, to run repeatedly:
   float acx,acy,acz,gyx,gyy,gyz,magx,magy,magz;
   if(IMU.readByte(MPU9250_ADDRESS,INT_STATUS) & 0x01){
@@ -64,8 +64,8 @@ void loop() {
     gyz = IMU.gyroCount[2]*IMU.gRes;
 
     magx = (float)IMU.magCount[0]*IMU.mRes*IMU.magCalibration[0]-IMU.magbias[0];
-    magy = (float)IMU.magCount[1]*IMU.mRes*IMU.magCalibration[1] -IMU.magbias[1];
-    magz = (float)IMU.magCount[2]*IMU.mRes*IMU.magCalibration[2] -IMU.magbias[2];
+    magy = (float)IMU.magCount[1]*IMU.mRes*IMU.magCalibration[1]-IMU.magbias[1];
+    magz = (float)IMU.magCount[2]*IMU.mRes*IMU.magCalibration[2]-IMU.magbias[2];
 
    IMU.updateTime();
     
@@ -80,8 +80,12 @@ void loop() {
     }
     IMU.delt_t = millis() - IMU.count;
 
-    IMU.yaw   = atan2(2.0f * (*(getQ()+1) * *(getQ()+2) + *getQ() **(getQ()+3)), *getQ() * *getQ() + *(getQ()+1) * *(getQ()+1)- *(getQ()+2) * *(getQ()+2) - *(getQ()+3) * *(getQ()+3));
-    IMU.roll  = atan2(2.0f * (*getQ() * *(getQ()+1) + *(getQ()+2) **(getQ()+3)), *getQ() * *getQ() - *(getQ()+1) * *(getQ()+1)- *(getQ()+2) * *(getQ()+2) + *(getQ()+3) * *(getQ()+3));
+    IMU.yaw   = atan2(2.0f * (*(getQ()+1) * *(getQ()+2) + *getQ() **(getQ()+3)), 
+                      *getQ() * *getQ() + *(getQ()+1) * *(getQ()+1)- *(getQ()+2) * *(getQ()+2) - *(getQ()+3) * *(getQ()+3));
+                      
+    IMU.roll  = atan2(2.0f * (*getQ() * *(getQ()+1) + *(getQ()+2) **(getQ()+3)), 
+                      *getQ() * *getQ() - *(getQ()+1) * *(getQ()+1)- *(getQ()+2) * *(getQ()+2) + *(getQ()+3) * *(getQ()+3));
+                      
     IMU.pitch = -asin(2.0f * (*(getQ()+1) * *(getQ()+3) - *getQ() **(getQ()+2)))*RAD_TO_DEG;
 
     
@@ -90,50 +94,56 @@ void loop() {
     float lastbar =  sqrt(abs(12100-lastpitch*lastpitch*16));
     float pitchbar = sqrt(abs(12100-IMU.pitch*IMU.pitch*16));
     //horizontal line
-    
-    M5.Lcd.drawLine(160-lastpitch*4*cos(lastroll)-lastbar*sin(lastroll),
-                    120+lastpitch*4*sin(lastroll)-lastbar*cos(lastroll),
-                    160-lastpitch*4*cos(lastroll)+lastbar*sin(lastroll),
-                    120+lastpitch*4*sin(lastroll)+lastbar*cos(lastroll),TFT_BLACK);
+    float coslroll=cos(lastroll);
+    float sinlroll=sin(lastroll);
+
+    float cosroll = cos(IMU.roll);
+    float sinroll = sin(IMU.roll);
+
+    M5.Lcd.drawLine(160-lastpitch*4*coslroll-lastbar*sinlroll,
+                    120+lastpitch*4*sinlroll-lastbar*coslroll,
+                    160-lastpitch*4*coslroll+lastbar*sinlroll,
+                    120+lastpitch*4*sinlroll+lastbar*coslroll,TFT_BLACK);
     if(abs(IMU.pitch*4)<100){
-    M5.Lcd.drawLine(160-IMU.pitch*4*cos(IMU.roll)-pitchbar*sin(IMU.roll),
-                    120+IMU.pitch*4*sin(IMU.roll)-pitchbar*cos(IMU.roll),
-                    160-IMU.pitch*4*cos(IMU.roll)+pitchbar*sin(IMU.roll),
-                    120+IMU.pitch*4*sin(IMU.roll)+pitchbar*cos(IMU.roll),TFT_GREEN);
+    M5.Lcd.drawLine(160-IMU.pitch*4*cosroll-pitchbar*sinroll,
+                    120+IMU.pitch*4*sinroll-pitchbar*cosroll,
+                    160-IMU.pitch*4*cosroll+pitchbar*sinroll,
+                    120+IMU.pitch*4*sinroll+pitchbar*cosroll,TFT_GREEN);
     }
     for(int i=-9;i<=9;i++){
-      M5.Lcd.drawLine(160-30,120+40*i+lastpitch*4,160+30,120+40*i+lastpitch*4,TFT_BLACK);
-      M5.Lcd.drawLine(160-15,120-20+40*i+lastpitch*4,160+15,120-20+40*i+lastpitch*4,TFT_BLACK);
-      M5.Lcd.setCursor(160-(lastpitch*4-40*i)*cos(lastroll)+30*sin(lastroll)+5,
-                        120+(lastpitch*4-40*i)*sin(lastroll)+30*cos(lastroll)-5);
+      //M5.Lcd.drawLine(160-30,120+40*i+lastpitch*4,160+30,120+40*i+lastpitch*4,TFT_BLACK);
+      //M5.Lcd.drawLine(160-15,120-20+40*i+lastpitch*4,160+15,120-20+40*i+lastpitch*4,TFT_BLACK);
+      M5.Lcd.setCursor(160-(lastpitch*4-40*i)*coslroll+30*sinlroll+5,
+                        120+(lastpitch*4-40*i)*sinlroll+30*coslroll-5);
       M5.Lcd.setTextColor(TFT_BLACK);
       M5.Lcd.printf("%d",i*10);
 
-     M5.Lcd.drawLine(160-(lastpitch*4-40*i)*cos(lastroll)-30*sin(lastroll),
-                      120+(lastpitch*4-40*i)*sin(lastroll)-30*cos(lastroll),
-                      160-(lastpitch*4-40*i)*cos(lastroll)+30*sin(lastroll),
-                      120+(lastpitch*4-40*i)*sin(lastroll)+30*cos(lastroll),
+
+     M5.Lcd.drawLine(160-(lastpitch*4-40*i)*coslroll-30*sinlroll,
+                      120+(lastpitch*4-40*i)*sinlroll-30*coslroll,
+                      160-(lastpitch*4-40*i)*coslroll+30*sinlroll,
+                      120+(lastpitch*4-40*i)*sinlroll+30*coslroll,
                       TFT_BLACK);
-     M5.Lcd.drawLine(160-(lastpitch*4-40*i-20)*cos(lastroll)-15*sin(lastroll),
-                      120+(lastpitch*4-40*i-20)*sin(lastroll)-15*cos(lastroll),
-                      160-(lastpitch*4-40*i-20)*cos(lastroll)+15*sin(lastroll),
-                      120+(lastpitch*4-40*i-20)*sin(lastroll)+15*cos(lastroll),
+     M5.Lcd.drawLine(160-(lastpitch*4-40*i-20)*coslroll-15*sinlroll,
+                      120+(lastpitch*4-40*i-20)*sinlroll-15*coslroll,
+                      160-(lastpitch*4-40*i-20)*coslroll+15*sinlroll,
+                      120+(lastpitch*4-40*i-20)*sinlroll+15*coslroll,
                       TFT_BLACK);
       
       if(abs(IMU.pitch*4-i*40)<100){
         
-         M5.Lcd.drawLine(160-(IMU.pitch*4-40*i)*cos(IMU.roll)-30*sin(IMU.roll),
-                          120+(IMU.pitch*4-40*i)*sin(IMU.roll)-30*cos(IMU.roll),
-                          160-(IMU.pitch*4-40*i)*cos(IMU.roll)+30*sin(IMU.roll),
-                          120+(IMU.pitch*4-40*i)*sin(IMU.roll)+30*cos(IMU.roll),
+         M5.Lcd.drawLine(160-(IMU.pitch*4-40*i)*cosroll-30*sinroll,
+                          120+(IMU.pitch*4-40*i)*sinroll-30*cosroll,
+                          160-(IMU.pitch*4-40*i)*cosroll+30*sinroll,
+                          120+(IMU.pitch*4-40*i)*sinroll+30*cosroll,
                           TFT_GREEN);
-         M5.Lcd.drawLine(160-(IMU.pitch*4-40*i-20)*cos(IMU.roll)-15*sin(IMU.roll),
-                          120+(IMU.pitch*4-40*i-20)*sin(IMU.roll)-15*cos(IMU.roll),
-                          160-(IMU.pitch*4-40*i-20)*cos(IMU.roll)+15*sin(IMU.roll),
-                          120+(IMU.pitch*4-40*i-20)*sin(IMU.roll)+15*cos(IMU.roll),
+         M5.Lcd.drawLine(160-(IMU.pitch*4-40*i-20)*cosroll-15*sinroll,
+                          120+(IMU.pitch*4-40*i-20)*sinroll-15*cosroll,
+                          160-(IMU.pitch*4-40*i-20)*cosroll+15*sinroll,
+                          120+(IMU.pitch*4-40*i-20)*sinroll+15*cosroll,
                           TFT_GREEN);
-         M5.Lcd.setCursor(160-(IMU.pitch*4-40*i)*cos(IMU.roll)+30*sin(IMU.roll)+5,
-                          120+(IMU.pitch*4-40*i)*sin(IMU.roll)+30*cos(IMU.roll)-5);
+         M5.Lcd.setCursor(160-(IMU.pitch*4-40*i)*cosroll+30*sinroll+5,
+                          120+(IMU.pitch*4-40*i)*sinroll+30*cosroll-5);
          M5.Lcd.setTextColor(TFT_GREEN);
          M5.Lcd.printf("%d",i*10);
         }
@@ -144,12 +154,15 @@ void loop() {
     //M5.Lcd.drawLine(160-80*sin(lastroll),120+80*cos(lastroll),160+80*sin(lastroll),120-80*cos(lastroll),TFT_BLACK);
     M5.Lcd.drawLine(160-50,120,160+50,120,TFT_ORANGE);
     //bank bar
-    M5.Lcd.drawLine(160+110*cos(lastroll),120-110*sin(lastroll),160+80*cos(lastroll),120-80*sin(lastroll),TFT_BLACK);
-    M5.Lcd.drawLine(160+110*cos(IMU.roll),120-110*sin(IMU.roll),160+80*cos(IMU.roll),120-80*sin(IMU.roll),TFT_GREEN);
+    M5.Lcd.drawLine(160+110*coslroll,120-110*sinlroll,160+80*coslroll,120-80*sinlroll,TFT_BLACK);
+    M5.Lcd.drawLine(160+110*cosroll,120-110*sinroll,160+80*cosroll,120-80*sinroll,TFT_GREEN);
 
+    M5.Lcd.drawLine(160-100*sin(lastacx/2),120+100*cos(lastacx/2),160-110*sin(lastacx/2),120+110*cos(lastacx/2),TFT_BLACK);
+    M5.Lcd.drawLine(160-100*sin(acx/2),120+100*cos(acx/2),160-110*sin(acx/2),120+110*cos(acx/2),TFT_GREEN);
+    
     M5.Lcd.setCursor(0,0);
     M5.Lcd.setTextColor(TFT_GREEN,TFT_BLACK);
-    M5.Lcd.println(IMU.yaw*RAD_TO_DEG);
+    M5.Lcd.printf("%+2.2f  %+2.2f\n",acx,acz);
 
     //GPS 
     //while(!gps.location.isUpdated()){
@@ -158,18 +171,20 @@ void loop() {
         int rawdata = GPSRaw.read();
         Serial.write(rawdata);
         if(gps.encode(rawdata)){
-          M5.Lcd.print("break");
+          //M5.Lcd.print("break");
           break;
         }
       }
    //   }
     
-    M5.Lcd.print(gps.satellites.value());
+    M5.Lcd.print(gps.location.lat());
 
     M5.update();
 
     lastroll= IMU.roll;
     lastpitch = IMU.pitch;
+
+    lastacx = acx;
 
     float g = sqrt(acx*acx+acy*acy+acz*acz);
     M5.Lcd.setCursor(0,210);
