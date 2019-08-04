@@ -14,3 +14,10 @@ for car,motorcycle,bicycle,etc...
 2. setup m5stack
 3. write adi.ino
 4. enjoy
+
+
+## How to calibrate 
+1. hold center button about 5 seconds
+2. keep display side up and level
+3. push left button
+4. reset m5 stack
